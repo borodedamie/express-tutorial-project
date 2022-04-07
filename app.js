@@ -8,13 +8,17 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var catalogRouter = require('./routes/catalog');
 
+var compression = require('compression');
+var helmet = require('helmet');
+
 var app = express();
 
 //Import the mongoose module
 var mongoose = require('mongoose');
 
 //Set up default mongoose connection
-var mongoDB = 'mongodb://admin:zas4h2WIzXKTJG4Q@tutorial-shard-00-00.5ilqd.mongodb.net:27017,tutorial-shard-00-01.5ilqd.mongodb.net:27017,tutorial-shard-00-02.5ilqd.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-t6lf81-shard-0&authSource=admin&retryWrites=true&w=majority';
+var dev_db_url = 'mongodb://admin:zas4h2WIzXKTJG4Q@tutorial-shard-00-00.5ilqd.mongodb.net:27017,tutorial-shard-00-01.5ilqd.mongodb.net:27017,tutorial-shard-00-02.5ilqd.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-t6lf81-shard-0&authSource=admin&retryWrites=true&w=majority';
+var mongoDB = process.env.MONGODB_URI || dev_db_url;
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 
 //Get the default connection
@@ -26,6 +30,9 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+app.use(compression()); //Compress all routes
+app.use(helmet());
 
 app.use(logger('dev'));
 app.use(express.json());
